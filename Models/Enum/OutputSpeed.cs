@@ -5,5 +5,5 @@ public enum OutputSpeed
     LowSpeed,
     MediumSpeed,
     HighSpeed,
-    VeryHighSpeed
+    VeryHighSpeed,
 }
