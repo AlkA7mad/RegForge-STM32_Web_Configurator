@@ -6,9 +6,11 @@ namespace RegForge.Api.Services;
 public class GpioCodeGeneratorService : IGpioCodeGeneratorService
 {
 
-    public string GenerateGpioCode(GpioConfig gpioConfig)
+    public string GenerateGpioCode(List <GpioConfig> gpioConfig)
     {
+
         var port = gpioConfig.Port.ToString().ToUpper();
+        var portM = gpioConfig[0].Port.ToString().ToUpper();
         
         StringBuilder stringBuilder = new StringBuilder("// Please include CMSIS file of your STM32 Board");
         stringBuilder.AppendLine("\n");

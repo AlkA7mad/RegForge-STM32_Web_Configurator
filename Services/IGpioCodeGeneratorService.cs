@@ -4,5 +4,5 @@ namespace RegForge.Api.Services;
 
 public interface IGpioCodeGeneratorService
 {
-    public string GenerateGpioCode(GpioConfig gpioConfig);
+    public string GenerateGpioCode(List <GpioConfig> gpioConfig);
 }

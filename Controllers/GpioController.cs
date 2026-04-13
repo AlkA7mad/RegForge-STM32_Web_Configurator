@@ -16,7 +16,7 @@ public class GpioController : ControllerBase
     }
     
     [HttpPost]
-    public ActionResult<string> Post([FromBody] GpioConfig gpioConfig)
+    public ActionResult<string> Post([FromBody] List <GpioConfig> gpioConfig)
     {
         return _gpioCodeGeneratorService.GenerateGpioCode(gpioConfig);
     }
