@@ -13,10 +13,12 @@ STM32CubeMX is powerful but complex and not available as a web application. RegF
 - **Backend:** C# / ASP.NET Core Web API (.NET 8)
 - **Frontend:** TypeScript / React / Vite *(planned)*
 
-## Current Features (V1)
+## Current Features (V1.1)
 
-- GPIO pin configuration via POST endpoint
+- Multi-pin GPIO configuration via single POST request
+- Automatic duplicate-free RCC clock enable per port
 - Supported registers: MODER, OTYPER, OSPEEDR, PUPDR
+- Grouped code output (all clocks → all MODER → all OTYPER → etc.)
 - Code generation using CMSIS naming conventions (`RCC->AHB2ENR`, `GPIOx->MODER`, etc.)
 
 ## API Usage
@@ -25,40 +27,73 @@ STM32CubeMX is powerful but complex and not available as a web application. RegF
 
 Request body:
 ```json
-{
-  "port": "A",
-  "pin": 5,
-  "mode": "OutputMode",
-  "outputType": "OutputPushPull",
-  "outputSpeed": "LowSpeed",
-  "pullType": "NoPull"
-}
+[
+  {
+    "port": "A",
+    "pin": 5,
+    "mode": "OutputMode",
+    "outputType": "OutputPushPull",
+    "outputSpeed": "LowSpeed",
+    "pullType": "NoPull"
+  },
+  {
+    "port": "B",
+    "pin": 3,
+    "mode": "InputMode",
+    "outputType": "OutputPushPull",
+    "outputSpeed": "LowSpeed",
+    "pullType": "PullUp"
+  }
+]
 ```
 
 Response:
 ```c
 // Please include CMSIS file of your STM32 Board
-
 // GPIO configuration
-
+ 
+/**
+ * Clock configuration
+ * Enable Clock(s): A, B
+ */
+ 
 // Enable GPIOA
 RCC->AHB2ENR |= RCC_AHB2ENR_GPIOAEN;
-
-// Set GPIO port mode
+ 
+// Enable GPIOB
+RCC->AHB2ENR |= RCC_AHB2ENR_GPIOBEN;
+ 
+/**
+ * MODER configuration
+ */
+ 
+// Set GPIOA port mode = OutputMode | Pin = 5
 GPIOA->MODER &= ~(3U << (5U * 2U));
 GPIOA->MODER |= (1U << (5U * 2U));
-
-// Set GPIO output type
+ 
+// Set GPIOB port mode = InputMode | Pin = 3
+GPIOB->MODER &= ~(3U << (3U * 2U));
+GPIOB->MODER |= (0U << (3U * 2U));
+ 
+/**
+ * OTYPER configuration
+ */
+ 
+// Set GPIOA output type | Pin = 5
 GPIOA->OTYPER &= ~(1U << (5U));
 GPIOA->OTYPER |= (0U << (5U));
-
-// Set GPIO port speed
-GPIOA->OSPEEDR &= ~(3U << (5U * 2U));
-GPIOA->OSPEEDR |= (0U << (5U * 2U));
-
-// Set GPIO pull type
+ 
+/**
+ * PUPDR configuration
+ */
+ 
+// Set GPIOA pull type | Pin = 5
 GPIOA->PUPDR &= ~(3U << (5U * 2U));
 GPIOA->PUPDR |= (0U << (5U * 2U));
+ 
+// Set GPIOB pull type | Pin = 3
+GPIOB->PUPDR &= ~(3U << (3U * 2U));
+GPIOB->PUPDR |= (1U << (3U * 2U));
 ```
 
 ## Supported Board
@@ -66,3 +101,10 @@ GPIOA->PUPDR |= (0U << (5U * 2U));
 | Board | Package | GPIO Ports |
 |---|---|---|
 | STM32G431RB | LQFP64 | A (0-15), B (0-15), C (0-15), D (2) |
+
+## Getting Started
+
+```bash
+cd RegForge.Api
+dotnet run
+```
