@@ -1,4 +1,5 @@
 using RegForge.Api.Models;
+using System.Linq;
 using System.Text;
 
 namespace RegForge.Api.Services;
@@ -8,55 +9,112 @@ public class GpioCodeGeneratorService : IGpioCodeGeneratorService
 
     public string GenerateGpioCode(List <GpioConfig> gpioConfig)
     {
-
-        var port = gpioConfig.Port.ToString().ToUpper();
-        var portM = gpioConfig[0].Port.ToString().ToUpper();
+        var distinctPorts = gpioConfig.Select(x => x.Port.ToString().ToUpper()).Distinct().ToList();
         
-        StringBuilder stringBuilder = new StringBuilder("// Please include CMSIS file of your STM32 Board");
-        stringBuilder.AppendLine("\n");
-        stringBuilder.AppendLine("// GPIO configuration");
-        stringBuilder.AppendLine("\n");
-        // Enable GPIO Clock
-        stringBuilder.AppendLine($"// Enable GPIO{port}");
-        stringBuilder.AppendLine($"RCC->AHB2ENR |= RCC_AHB2ENR_GPIO{port}EN;");
-        stringBuilder.AppendLine("\n");
+        StringBuilder stringBuilder = new StringBuilder("// Please include CMSIS file of your STM32 Board\n");
+        stringBuilder.AppendLine("// GPIO configuration\n");
 
-        // Set GPIO port mode
-        stringBuilder.AppendLine("// Set GPIO port mode");
-        stringBuilder.AppendLine($"GPIO{port}->MODER &= ~(3U << ({gpioConfig.Pin}U * 2U));");
-        stringBuilder.AppendLine($"GPIO{port}->MODER |= ({(int)gpioConfig.Mode}U << ({gpioConfig.Pin}U * 2U));");
-        stringBuilder.AppendLine("\n");
-        // Set GPIO port output type
-        if (gpioConfig.Mode == PinMode.OutputMode)
+        // Enable GPIO Clocks
+        EnableClock(stringBuilder, distinctPorts);
+        
+        // Configure MODER
+        ConfigureModer(stringBuilder, gpioConfig);
+        
+        if (gpioConfig.Any(x => x.Mode == PinMode.OutputMode))
         {
-            stringBuilder.AppendLine("// Set GPIO output type");
-            stringBuilder.AppendLine($"GPIO{port}->OTYPER &= ~(1U << ({gpioConfig.Pin}U));");
-            stringBuilder.AppendLine($"GPIO{port}->OTYPER |= ({(int)gpioConfig.OutputType}U << ({gpioConfig.Pin}U));");
-            stringBuilder.AppendLine("\n");
+            // Configure OTYPER
+            ConfigureOtyper(stringBuilder, gpioConfig);
+        
+            // Configure OSPEEDR
+            ConfigureOspeedr(stringBuilder, gpioConfig);
+        }
+        
+        // Configure PUPDR
+        ConfigurePupdr(stringBuilder, gpioConfig);
+        return stringBuilder.ToString();
+    }
 
-            // Set GPIO port output speed if present
-            if (gpioConfig.OutputSpeed != null)
+    private void EnableClock(StringBuilder sb, List<string> distinctPorts)
+    {
+        sb.AppendLine("/**\n" +
+                      " * Clock configuration\n" +
+                      $" * Enable Clock(s): {string.Join(",", distinctPorts)}\n" +
+                      " */\n"
+                      );
+        foreach (var port in distinctPorts)
+        {
+            sb.AppendLine($"// Enable GPIO{port}");
+            sb.AppendLine($"RCC->AHB2ENR |= RCC_AHB2ENR_GPIO{port}EN;\n");
+        }
+    }
+
+    private void ConfigureModer(StringBuilder sb, List<GpioConfig> gpioConfig)
+    {
+        sb.AppendLine("/**\n" +
+                      " * MODER configuration\n" +
+                      " */\n"
+                      );
+        foreach (var config in gpioConfig)
+        {
+            var port = config.Port.ToString().ToUpper();
+            sb.AppendLine($"// Set GPIO{port} port mode = {config.Mode} | Pin = {config.Pin}");
+            sb.AppendLine($"GPIO{port}->MODER &= ~(3U << ({config.Pin}U * 2U));");
+            sb.AppendLine($"GPIO{port}->MODER |= ({(int)config.Mode}U << ({config.Pin}U * 2U));\n");
+
+        }
+    }
+
+    private void ConfigureOtyper(StringBuilder sb, List<GpioConfig> gpioConfig)
+    {
+        sb.AppendLine("/**\n" +
+                      " * OTYPER configuration\n" +
+                      " */\n"
+                      );
+        foreach (var config in gpioConfig)
+        {
+            var port = config.Port.ToString().ToUpper();
+            if (config.Mode == PinMode.OutputMode)
             {
-                stringBuilder.AppendLine("// Set GPIO port speed");
-                stringBuilder.AppendLine($"GPIO{port}->OSPEEDR &= ~(3U << ({gpioConfig.Pin}U * 2U));");
-                stringBuilder.AppendLine(
-                    $"GPIO{port}->OSPEEDR |= ({(int)gpioConfig.OutputSpeed}U << ({gpioConfig.Pin}U * 2U));");
-                stringBuilder.AppendLine("\n");
+                sb.AppendLine($"// Set GPIO{port} output type | Pin = {config.Pin}");
+                sb.AppendLine($"GPIO{port}->OTYPER &= ~(1U << ({config.Pin}U));");
+                sb.AppendLine($"GPIO{port}->OTYPER |= ({(int)config.OutputType}U << ({config.Pin}U));\n");
             }
         }
+    }
 
-        if (gpioConfig.Mode == PinMode.AlternateFunction)
+    private void ConfigureOspeedr(StringBuilder sb, List<GpioConfig> gpioConfig)
+    {
+        sb.AppendLine("/**\n" +
+                      " * OSPEEDR configuration\n" +
+                      " */\n"
+                      );
+        foreach (var config in gpioConfig)
         {
-            stringBuilder.AppendLine("// alternate function coming soon");
-            stringBuilder.AppendLine("\n");
+            var port = config.Port.ToString().ToUpper();
+            
+            if (config.OutputSpeed != null && config.Mode == PinMode.OutputMode)
+            {
+                sb.AppendLine($"// Set GPIO{port} port speed | Pin = {config.Pin}");
+                sb.AppendLine($"GPIO{port}->OSPEEDR &= ~(3U << ({config.Pin}U * 2U));");
+                sb.AppendLine(
+                    $"GPIO{port}->OSPEEDR |= ({(int)config.OutputSpeed}U << ({config.Pin}U * 2U));\n");
+            }
         }
-        
-        // Set GPIO port pull-up/pull-down
-        stringBuilder.AppendLine("// Set GPIO pull type");
-        stringBuilder.AppendLine($"GPIO{port}->PUPDR &= ~(3U << ({gpioConfig.Pin}U * 2U));");
-        stringBuilder.AppendLine($"GPIO{port}->PUPDR |= ({(int)gpioConfig.PullType}U << ({gpioConfig.Pin}U * 2U));");
-        
-        
-        return stringBuilder.ToString();
+    }
+
+    private void ConfigurePupdr(StringBuilder sb, List<GpioConfig> gpioConfig)
+    {
+        sb.AppendLine("/**\n" +
+                      " * PUPDR configuration\n" +
+                      " */\n"
+                      );
+        foreach (var config in gpioConfig)
+        {
+            var port = config.Port.ToString().ToUpper();
+            sb.AppendLine($"// Set GPIO{port} pull type | Pin = {config.Pin}");
+            sb.AppendLine($"GPIO{port}->PUPDR &= ~(3U << ({config.Pin}U * 2U));");
+            sb.AppendLine($"GPIO{port}->PUPDR |= ({(int)config.PullType}U << ({config.Pin}U * 2U));\n");
+            
+        }
     }
 }
