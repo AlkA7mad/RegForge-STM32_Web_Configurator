@@ -9,7 +9,7 @@ namespace RegForge.Api.Controllers;
 public class GpioController : ControllerBase
 {
     private readonly IGpioCodeGeneratorService _gpioCodeGeneratorService;
-
+    
     public GpioController(IGpioCodeGeneratorService gpioCodeGeneratorService)
     {
         _gpioCodeGeneratorService = gpioCodeGeneratorService;
@@ -18,6 +18,13 @@ public class GpioController : ControllerBase
     [HttpPost]
     public ActionResult<string> Post([FromBody] List <GpioConfig> gpioConfig)
     {
-        return _gpioCodeGeneratorService.GenerateGpioCode(gpioConfig);
+        var result = _gpioCodeGeneratorService.GenerateGpioCode(gpioConfig);
+
+        if (!result.Success)
+        {
+            return BadRequest(result.Errors);
+        }
+        
+        return Ok(result.GeneratedCode);
     }
 }

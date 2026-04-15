@@ -1,13 +1,19 @@
 using RegForge.Api.Models;
 using System.Text;
+using RegForge.Api.DTOs;
 
 namespace RegForge.Api.Services;
 
 public class GpioCodeGeneratorService : IGpioCodeGeneratorService
 {
-
-    public string GenerateGpioCode(List <GpioConfig> gpioConfig)
+    public CodeGenerationResult GenerateGpioCode(List <GpioConfig> gpioConfig)
     {
+        // Validate configuration
+        var validationResult = ValidateConfig(gpioConfig);
+        if (!validationResult.Success)
+        {
+            return validationResult;
+        }
         // Get all unique ports in uppercase into a list
         var distinctPorts = gpioConfig.Select(x => x.Port.ToString().ToUpper()).Distinct().ToList();
         
@@ -16,7 +22,7 @@ public class GpioCodeGeneratorService : IGpioCodeGeneratorService
 
         // Enable GPIO Clocks
         EnableClock(stringBuilder, distinctPorts);
-        
+
         // Configure MODER
         ConfigureModer(stringBuilder, gpioConfig);
         
@@ -37,8 +43,13 @@ public class GpioCodeGeneratorService : IGpioCodeGeneratorService
             // Configure AF
             ConfigureAlternateFunction(stringBuilder, gpioConfig);
         }
-       
-        return stringBuilder.ToString();
+
+        return new CodeGenerationResult
+        {
+            Success = true,
+            GeneratedCode = stringBuilder.ToString(),
+            Errors = new List<string>()
+        };
     }
 
     private void EnableClock(StringBuilder sb, List<string> distinctPorts)
@@ -132,5 +143,45 @@ public class GpioCodeGeneratorService : IGpioCodeGeneratorService
                       " */\n"
         );
         sb.AppendLine("// Alternate function coming soon!");
+    }
+
+    private CodeGenerationResult ValidateConfig(List<GpioConfig> gpioConfig)
+    {
+        // Validation only for STM32 Nucleo G431RB (temp solution)
+        CodeGenerationResult codeGenerationResult =  new CodeGenerationResult();
+
+        // Define allowed ports
+        var allowedPorts = new List<char> { 'A',  'B', 'C', 'D', 'a', 'b', 'c', 'd' };
+        // Define allowed pin range
+        var allowedPins = Enumerable.Range(0, 16).ToList();
+        // Define duplicates
+        var duplicates = gpioConfig
+            .GroupBy(x => new { x.Port, x.Pin})
+            .Any(y => y.Count() > 1);
+        
+        if (gpioConfig.Count == 0)
+        {
+            codeGenerationResult.Success = false;
+            codeGenerationResult.Errors.Add("No GPIO config found");
+        }
+
+        if (gpioConfig.Any(x => !allowedPorts.Contains(x.Port)))
+        {
+            codeGenerationResult.Success = false;
+            codeGenerationResult.Errors.Add("Invalid GPIO port");
+        }
+
+        if (gpioConfig.Any(x => !allowedPins.Contains(x.Pin)))
+        {
+            codeGenerationResult.Success = false;
+            codeGenerationResult.Errors.Add("Invalid GPIO pin");
+        }
+
+        if (duplicates)
+        {
+            codeGenerationResult.Success = false;
+            codeGenerationResult.Errors.Add("Duplicate GPIO pin configuration found");
+        }
+        return  codeGenerationResult;
     }
 }
