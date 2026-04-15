@@ -13,13 +13,17 @@ STM32CubeMX is powerful but complex and not available as a web application. RegF
 - **Backend:** C# / ASP.NET Core Web API (.NET 8)
 - **Frontend:** TypeScript / React / Vite *(planned)*
 
-## Current Features (V1.1)
+## Current Features (V1.2)
 
 - Multi-pin GPIO configuration via single POST request
 - Automatic duplicate-free RCC clock enable per port
 - Supported registers: MODER, OTYPER, OSPEEDR, PUPDR
 - Grouped code output (all clocks → all MODER → all OTYPER → etc.)
 - Code generation using CMSIS naming conventions (`RCC->AHB2ENR`, `GPIOx->MODER`, etc.)
+- Input validation with error messages:
+    - Invalid port detection (only A, B, C, D allowed)
+    - Invalid pin range detection (0-15)
+    - Duplicate pin configuration detection
 
 ## API Usage
 
