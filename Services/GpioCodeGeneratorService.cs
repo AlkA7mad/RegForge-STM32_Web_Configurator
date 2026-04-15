@@ -1,5 +1,4 @@
 using RegForge.Api.Models;
-using System.Linq;
 using System.Text;
 
 namespace RegForge.Api.Services;
@@ -9,6 +8,7 @@ public class GpioCodeGeneratorService : IGpioCodeGeneratorService
 
     public string GenerateGpioCode(List <GpioConfig> gpioConfig)
     {
+        // Get all unique ports in uppercase into a list
         var distinctPorts = gpioConfig.Select(x => x.Port.ToString().ToUpper()).Distinct().ToList();
         
         StringBuilder stringBuilder = new StringBuilder("// Please include CMSIS file of your STM32 Board\n");
@@ -31,6 +31,13 @@ public class GpioCodeGeneratorService : IGpioCodeGeneratorService
         
         // Configure PUPDR
         ConfigurePupdr(stringBuilder, gpioConfig);
+
+        if (gpioConfig.Any(x => x.Mode == PinMode.AlternateFunction))
+        {
+            // Configure AF
+            ConfigureAlternateFunction(stringBuilder, gpioConfig);
+        }
+       
         return stringBuilder.ToString();
     }
 
@@ -116,5 +123,14 @@ public class GpioCodeGeneratorService : IGpioCodeGeneratorService
             sb.AppendLine($"GPIO{port}->PUPDR |= ({(int)config.PullType}U << ({config.Pin}U * 2U));\n");
             
         }
+    }
+
+    private void ConfigureAlternateFunction(StringBuilder sb, List<GpioConfig> gpioConfig)
+    {
+        sb.AppendLine("/**\n" +
+                      " * Alternate function configuration\n" +
+                      " */\n"
+        );
+        sb.AppendLine("// Alternate function coming soon!");
     }
 }
