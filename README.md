@@ -112,3 +112,7 @@ GPIOB->PUPDR |= (1U << (3U * 2U));
 cd RegForge.Api
 dotnet run
 ```
+
+## License
+
+This project is licensed under the GPL-3.0 Licence - see the [LICENSE](LICENSE) file for details.
