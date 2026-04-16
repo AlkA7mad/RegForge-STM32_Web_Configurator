@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace RegForge.Api.DTOs;
 
 public class CodeGenerationResult
