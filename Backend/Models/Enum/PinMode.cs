@@ -1,4 +1,4 @@
-namespace RegForge.Api.Models;
+namespace MCUGen.Api.Models;
 
 public enum PinMode
 {

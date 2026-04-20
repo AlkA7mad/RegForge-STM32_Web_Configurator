@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.Options;
-using RegForge.Api.Services;
+using MCUGen.Api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 

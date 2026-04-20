@@ -1,7 +1,7 @@
-using RegForge.Api.DTOs;
-using RegForge.Api.Models;
+using MCUGen.Api.DTOs;
+using MCUGen.Api.Models;
 
-namespace RegForge.Api.Services;
+namespace MCUGen.Api.Services;
 
 public interface IGpioCodeGeneratorService
 {

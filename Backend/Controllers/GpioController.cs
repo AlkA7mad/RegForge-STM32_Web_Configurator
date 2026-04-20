@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
-using RegForge.Api.Models;
-using RegForge.Api.Services;
+using MCUGen.Api.Models;
+using MCUGen.Api.Services;
 
-namespace RegForge.Api.Controllers;
+namespace MCUGen.Api.Controllers;
 
 [ApiController]
 [Route("[controller]")]

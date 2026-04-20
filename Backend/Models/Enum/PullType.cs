@@ -1,4 +1,4 @@
-namespace RegForge.Api.Models.Enum;
+namespace MCUGen.Api.Models.Enum;
 
 public enum PullType
 {

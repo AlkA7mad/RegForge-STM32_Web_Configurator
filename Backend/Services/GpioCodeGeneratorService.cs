@@ -1,8 +1,8 @@
-using RegForge.Api.Models;
+using MCUGen.Api.Models;
 using System.Text;
-using RegForge.Api.DTOs;
+using MCUGen.Api.DTOs;
 
-namespace RegForge.Api.Services;
+namespace MCUGen.Api.Services;
 
 public class GpioCodeGeneratorService : IGpioCodeGeneratorService
 {

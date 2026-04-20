@@ -1,6 +1,6 @@
-using RegForge.Api.Models.Enum;
+using MCUGen.Api.Models.Enum;
 
-namespace RegForge.Api.Models;
+namespace MCUGen.Api.Models;
 
 
 public class GpioConfig
