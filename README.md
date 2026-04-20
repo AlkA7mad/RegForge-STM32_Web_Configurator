@@ -1,8 +1,8 @@
-# RegForge-STM32_Web_Configurator
+# MCUGen
 
 🚧 **Work in Progress**
 
-RegForge is a web-based configuration tool for the STM32 Nucleo-G431RB microcontroller. It takes GPIO pin configurations as input through a REST API and generates ready-to-use bare-metal C initialization code using CMSIS headers.
+MCUGen is a web-based configuration tool for the STM32 Nucleo-G431RB microcontroller. It takes GPIO pin configurations as input through a REST API and generates ready-to-use bare-metal C initialization code using CMSIS headers.
 
 ## Why?
 
