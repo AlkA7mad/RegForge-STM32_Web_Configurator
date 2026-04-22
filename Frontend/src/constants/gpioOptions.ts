@@ -1,3 +1,4 @@
+import type { PinData } from "./PinConfig.types";
 
 export const portOptions = [
     { label: "Port A", value: "A" },
@@ -35,3 +36,12 @@ export const pullTypeOptions = [
     { label: "Pull-up", value: "PullUp" },
     { label: "Pull-down", value: "PullDown" }
 ]
+
+export const defaultPin: PinData = {
+    port: "A",
+    pin: "0",
+    mode: "InputMode",
+    outputType: "OutputPushPull",
+    outputSpeed: "LowSpeed",
+    pullType: "NoPull"
+}
