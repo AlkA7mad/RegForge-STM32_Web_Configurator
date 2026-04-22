@@ -1,4 +1,3 @@
-import Dropdown from "../../components/Dropdown/Dropdown";
 
 function Configurator () {
 
@@ -7,10 +6,7 @@ function Configurator () {
         <div>
             <h1>MCUGen – STM32 Configurator</h1>
             <div className="configuration"></div>
-            {/* <label>{ Dropdown name }</label>  */}
-            <Dropdown
-            // pros
-            />
+            
             <div className="generatedCode"></div>
         </div>
         </>

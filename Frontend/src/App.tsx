@@ -1,11 +1,12 @@
 
 import './App.css'
+import AppRouter from './AppRouter'
 
 function App() {
 
   return (
     <>
-      <h1>RegForge project</h1>
+      <AppRouter />
     </>
   )
 }
