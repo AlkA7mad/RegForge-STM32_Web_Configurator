@@ -6,14 +6,16 @@ MCUGen is a web-based configuration tool for the STM32 Nucleo-G431RB microcontro
 
 ## Why?
 
-STM32CubeMX is powerful but complex and not available as a web application. RegForge aims to simplify the configuration process for common tasks like GPIO setup, providing a lightweight and user-friendly alternative.
+STM32CubeMX is powerful but complex and not available as a web application. MCUGen aims to simplify the configuration process for common tasks like GPIO setup, providing a lightweight and user-friendly alternative.
 
 ## Tech Stack
 
-- **Backend:** C# / ASP.NET Core Web API (.NET 8)
-- **Frontend:** TypeScript / React / Vite *(planned)*
+- **Backend:** C# / ASP.NET Core Web API (.NET 10)
+- **Frontend:** TypeScript / React / Vite
 
-## Current Features (V1.2)
+## Current Features (V1.3)
+
+### Backend
 
 - Multi-pin GPIO configuration via single POST request
 - Automatic duplicate-free RCC clock enable per port
@@ -21,9 +23,19 @@ STM32CubeMX is powerful but complex and not available as a web application. RegF
 - Grouped code output (all clocks → all MODER → all OTYPER → etc.)
 - Code generation using CMSIS naming conventions (`RCC->AHB2ENR`, `GPIOx->MODER`, etc.)
 - Input validation with error messages:
-    - Invalid port detection (only A, B, C, D allowed)
-    - Invalid pin range detection (0-15)
-    - Duplicate pin configuration detection
+  - Invalid port detection (only A, B, C, D allowed)
+  - Invalid pin range detection (0–15)
+  - Duplicate pin configuration detection
+
+### Frontend
+
+- Interactive GPIO pin configuration form
+- Reusable, typed `Dropdown` component
+- Per-pin `PinConfig` component with 6 configurable fields (port, pin, mode, output type, speed, pull type)
+- Add/remove pins dynamically
+- Generate Code button triggers POST request to backend
+- Display generated C code or validation errors from the backend
+- TypeScript + SCSS design tokens foundation
 
 ## API Usage
 
@@ -51,7 +63,16 @@ Request body:
 ]
 ```
 
-Response:
+**Response:**
+
+```json
+{
+  "success": true,
+  "generatedCode": "// Please include CMSIS file of your STM32 Board\n// GPIO configuration\n...",
+  "errors": []
+}
+```
+**Example generated code:**
 ```c
 // Please include CMSIS file of your STM32 Board
 // GPIO configuration
@@ -108,10 +129,24 @@ GPIOB->PUPDR |= (1U << (3U * 2U));
 
 ## Getting Started
 
+### Backend
+
 ```bash
-cd RegForge.Api
+cd MCUGen.Api
 dotnet run
 ```
+
+Backend runs at `http://localhost:5131`.
+
+### Frontend
+
+```bash
+cd Frontend
+npm install
+npm run dev
+```
+
+Frontend runs at `http://localhost:5173/configurator`.
 
 ## License
 
