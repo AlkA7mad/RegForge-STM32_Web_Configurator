@@ -1,3 +1,5 @@
+// PinConfig.tsx
+
 import {
   modeOptions,
   outputSpeedOptions,
