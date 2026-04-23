@@ -1,3 +1,4 @@
+using MCUGen.Api.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using MCUGen.Api.Models;
 using MCUGen.Api.Services;
@@ -16,15 +17,15 @@ public class GpioController : ControllerBase
     }
     
     [HttpPost]
-    public ActionResult<string> Post([FromBody] List <GpioConfig> gpioConfig)
+    public ActionResult<CodeGenerationResult> Post([FromBody] List <GpioConfig> gpioConfig)
     {
         var result = _gpioCodeGeneratorService.GenerateGpioCode(gpioConfig);
 
         if (!result.Success)
         {
-            return BadRequest(result.Errors);
+            return BadRequest(result);
         }
         
-        return Ok(result.GeneratedCode);
+        return Ok(result);
     }
 }
