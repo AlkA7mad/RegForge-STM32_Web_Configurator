@@ -1,1 +1,62 @@
 
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+ 
+.label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: rgba(186, 193, 184, 0.65);
+  padding-left: 2px;
+}
+ 
+.select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+ 
+  width: 100%;
+  padding: 10px 36px 10px 12px;
+ 
+  background-color: rgba(10, 10, 15, 0.55);
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none'><path d='M1 1L6 6L11 1' stroke='%2375258b' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+ 
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+ 
+  color: var(--color-text);
+  font-family: var(--font-ui), sans-serif;
+  font-size: 14px;
+  line-height: 1.2;
+ 
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+ 
+  transition: border-color 160ms ease, box-shadow 160ms ease,
+    background-color 160ms ease;
+ 
+  &:hover {
+    border-color: rgba(117, 37, 139, 0.45);
+    background-color: rgba(20, 20, 32, 0.65);
+  }
+ 
+  &:focus {
+    outline: none;
+    border-color: rgba(117, 37, 139, 0.75);
+    box-shadow:
+      0 0 0 3px rgba(117, 37, 139, 0.22),
+      0 0 24px rgba(236, 72, 153, 0.18);
+  }
+ 
+  option {
+    background-color: #141420;
+    color: var(--color-text);
+  }
+}

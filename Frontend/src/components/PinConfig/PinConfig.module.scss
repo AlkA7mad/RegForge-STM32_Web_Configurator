@@ -1,0 +1,126 @@
+
+.card {
+  position: relative;
+  isolation: isolate;
+ 
+  padding: var(--space-lg);
+  border-radius: 18px;
+ 
+  background: linear-gradient(
+    135deg,
+    rgba(20, 20, 32, 0.72) 0%,
+    rgba(20, 20, 32, 0.48) 100%
+  );
+  backdrop-filter: blur(18px) saturate(160%);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+ 
+  border: 1px solid rgba(255, 255, 255, 0.08);
+ 
+  box-shadow:
+    0 0 0 1px rgba(117, 37, 139, 0.25),
+    0 12px 36px rgba(117, 37, 139, 0.28),
+    0 0 80px rgba(236, 72, 153, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    inset 0 0 40px rgba(16, 185, 129, 0.04);
+ 
+  transition: transform 200ms ease, box-shadow 200ms ease;
+ 
+  &::before {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(
+      135deg,
+      rgba(117, 37, 139, 0.7) 0%,
+      rgba(236, 72, 153, 0.35) 50%,
+      rgba(16, 185, 129, 0.35) 100%
+    );
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+    opacity: 0.55;
+    z-index: -1;
+  }
+ 
+  &:hover {
+    box-shadow:
+      0 0 0 1px rgba(117, 37, 139, 0.4),
+      0 14px 44px rgba(117, 37, 139, 0.35),
+      0 0 100px rgba(236, 72, 153, 0.18),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  }
+}
+ 
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-md);
+  gap: var(--space-md);
+}
+ 
+.title {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: rgba(186, 193, 184, 0.8);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+ 
+  &::before {
+    content: "";
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--color-saccent);
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.7);
+  }
+}
+ 
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-md);
+ 
+  @media (max-width: 720px) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+ 
+  @media (max-width: 480px) {
+    grid-template-columns: 1fr;
+  }
+}
+ 
+.removeButton {
+  appearance: none;
+  border: 1px solid rgba(236, 72, 153, 0.35);
+  background: rgba(236, 72, 153, 0.08);
+  color: #f9a8d4;
+  font-family: var(--font-ui), sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  padding: 6px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 160ms ease;
+ 
+  &:hover {
+    background: rgba(236, 72, 153, 0.18);
+    border-color: rgba(236, 72, 153, 0.55);
+    color: #fbcfe8;
+    box-shadow: 0 0 18px rgba(236, 72, 153, 0.3);
+  }
+ 
+  &:active {
+    transform: translateY(1px);
+  }
+}
