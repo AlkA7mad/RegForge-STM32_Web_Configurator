@@ -35,7 +35,13 @@ function PinConfig({
           label="Port"
           options={options.ports}
           value={pin.port}
-          onChange={(newPort) => onChange({ ...pin, port: newPort })}
+          onChange={(newPort) =>
+            onChange({
+              ...pin,
+              port: newPort,
+              pin: ports[`GPIO${newPort}`].pins[0].toString(),
+            })
+          }
         />
         <Dropdown
           label="Pin"
