@@ -1,0 +1,54 @@
+// GPIO Configuration
+// Please include CMSIS file of your STM32 Board
+/**
+ * Clock configuration
+ * Enable Clock(s): {{ ports | array.join "," }}
+ */
+{{ for port in ports }}
+// Enable GPIO{{ port }}
+RCC->AHB2ENR |= RCC_AHB2ENR_GPIO{{ port }}EN;
+{{ end }}
+/**
+ * MODER configuration
+ */
+{{ for config in pins }}
+// Set GPIO{{ config.port }} port mode = {{ config.mode }} | Pin = {{ config.pin }}
+GPIO{{ config.port }}->MODER &= ~(3U << ({{ config.pin }}U * 2U));
+GPIO{{ config.port }}->MODER |= ({{ config.mode_value }}U << ({{ config.pin }}U * 2U));
+{{ end }}
+{{~ if has_outputs ~}}
+/**
+ * OTYPER configuration
+ */
+{{~ for config in pins ~}}
+{{ if config.mode == "Output" }}
+// Set GPIO{{ config.port }} output type | Pin = {{ config.pin }}
+GPIO{{ config.port }}->OTYPER &= ~(1U << ({{ config.pin }}U));
+GPIO{{ config.port }}->OTYPER |= ({{ config.output_type_value }}U << ({{ config.pin }}U));
+{{ end }}
+{{~ end ~}}
+/**
+ * OSPEEDR configuration
+ */
+{{~ for config in pins ~}}
+{{ if config.mode == "Output" }}
+// Set GPIO{{ config.port }} port speed | Pin = {{ config.pin }}
+GPIO{{ config.port }}->OSPEEDR &= ~(3U << ({{ config.pin }}U * 2U));
+GPIO{{ config.port }}->OSPEEDR |= ({{ config.output_speed_value }}U << ({{ config.pin }}U * 2U));
+{{ end }}
+{{~ end ~}}
+{{~ end ~}}
+/**
+ * PUPDR configuration
+ */
+{{ for config in pins }}
+// Set GPIO{{ config.port }} pull type | Pin = {{ config.pin }}
+GPIO{{ config.port }}->PUPDR &= ~(3U << ({{ config.pin }}U * 2U));
+GPIO{{ config.port }}->PUPDR |= ({{ config.pull_type_value }}U << ({{ config.pin }}U * 2U));
+{{ end }}
+{{ if has_alternate_functions }}
+/**
+ * Alternate function configuration
+ */
+// Alternate function coming soon!
+{{ end }}

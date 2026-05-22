@@ -1,6 +1,6 @@
 using MCUGen.Api.Models;
-using System.Text;
 using MCUGen.Api.DTOs;
+using Scriban;
 
 namespace MCUGen.Api.Services.GpioCodeGenerator;
 
@@ -8,135 +8,39 @@ public class GpioCodeGeneratorService : IGpioCodeGeneratorService
 {
     public CodeGenerationResult GenerateGpioCode(List <GpioConfig> gpioConfig)
     {
-        // Validate configuration
         var validationResult = ValidateConfig(gpioConfig);
         if (!validationResult.Success)
         {
             return validationResult;
         }
-        // Get all unique ports in uppercase into a list
-        var distinctPorts = gpioConfig.Select(x => x.Port.ToString().ToUpper()).Distinct().ToList();
-        
-        StringBuilder stringBuilder = new StringBuilder("// Please include CMSIS file of your STM32 Board\n");
-        stringBuilder.AppendLine("// GPIO configuration\n");
 
-        EnableClock(stringBuilder, distinctPorts);
-
-        ConfigureModer(stringBuilder, gpioConfig);
-        
-        if (gpioConfig.Any(x => x.Mode == PinMode.Output))
+        var templateData = new
         {
-            ConfigureOtyper(stringBuilder, gpioConfig);
-            
-            ConfigureOspeedr(stringBuilder, gpioConfig);
-        }
+            ports = gpioConfig.Select(x => x.Port.ToString().ToUpper()).Distinct().ToList(),
+            has_outputs = gpioConfig.Any(x => x.Mode == PinMode.Output),
+            has_alternate_functions = gpioConfig.Any(x => x.Mode == PinMode.AlternateFunction),
+            pins = gpioConfig.Select(config => new
+            {
+                port = config.Port.ToString().ToUpper(),
+                pin = config.Pin,
+                mode = config.Mode.ToString(),
+                mode_value = (int)config.Mode,
+                output_type_value = (int)config.OutputType,
+                output_speed_value = (int)config.OutputSpeed,
+                pull_type_value    = (int)config.PullType,
+            }).ToList()
+        };
+
+        var templateText = File.ReadAllText("CodeGeneratorTemplates/BareMetal/gpio.sbn");
+        var template = Template.Parse(templateText);
+        var generatedCode = template.Render(templateData);
         
-        ConfigurePupdr(stringBuilder, gpioConfig);
-
-        if (gpioConfig.Any(x => x.Mode == PinMode.AlternateFunction))
-        {
-            ConfigureAlternateFunction(stringBuilder, gpioConfig);
-        }
-
-        return new CodeGenerationResult
+        return new CodeGenerationResult()
         {
             Success = true,
-            GeneratedCode = stringBuilder.ToString(),
+            GeneratedCode = generatedCode,
             Errors = new List<string>()
         };
-    }
-
-    private void EnableClock(StringBuilder sb, List<string> distinctPorts)
-    {
-        sb.AppendLine("/**\n" +
-                      " * Clock configuration\n" +
-                      $" * Enable Clock(s): {string.Join(",", distinctPorts)}\n" +
-                      " */\n"
-                      );
-        foreach (var port in distinctPorts)
-        {
-            sb.AppendLine($"// Enable GPIO{port}");
-            sb.AppendLine($"RCC->AHB2ENR |= RCC_AHB2ENR_GPIO{port}EN;\n");
-        }
-    }
-
-    private void ConfigureModer(StringBuilder sb, List<GpioConfig> gpioConfig)
-    {
-        sb.AppendLine("/**\n" +
-                      " * MODER configuration\n" +
-                      " */\n"
-                      );
-        foreach (var config in gpioConfig)
-        {
-            var port = config.Port.ToString().ToUpper();
-            sb.AppendLine($"// Set GPIO{port} port mode = {config.Mode} | Pin = {config.Pin}");
-            sb.AppendLine($"GPIO{port}->MODER &= ~(3U << ({config.Pin}U * 2U));");
-            sb.AppendLine($"GPIO{port}->MODER |= ({(int)config.Mode}U << ({config.Pin}U * 2U));\n");
-
-        }
-    }
-
-    private void ConfigureOtyper(StringBuilder sb, List<GpioConfig> gpioConfig)
-    {
-        sb.AppendLine("/**\n" +
-                      " * OTYPER configuration\n" +
-                      " */\n"
-                      );
-        foreach (var config in gpioConfig)
-        {
-            var port = config.Port.ToString().ToUpper();
-            if (config.Mode == PinMode.Output)
-            {
-                sb.AppendLine($"// Set GPIO{port} output type | Pin = {config.Pin}");
-                sb.AppendLine($"GPIO{port}->OTYPER &= ~(1U << ({config.Pin}U));");
-                sb.AppendLine($"GPIO{port}->OTYPER |= ({(int)config.OutputType}U << ({config.Pin}U));\n");
-            }
-        }
-    }
-
-    private void ConfigureOspeedr(StringBuilder sb, List<GpioConfig> gpioConfig)
-    {
-        sb.AppendLine("/**\n" +
-                      " * OSPEEDR configuration\n" +
-                      " */\n"
-                      );
-        foreach (var config in gpioConfig)
-        {
-            var port = config.Port.ToString().ToUpper();
-            
-            if (config.OutputSpeed != null && config.Mode == PinMode.Output)
-            {
-                sb.AppendLine($"// Set GPIO{port} port speed | Pin = {config.Pin}");
-                sb.AppendLine($"GPIO{port}->OSPEEDR &= ~(3U << ({config.Pin}U * 2U));");
-                sb.AppendLine(
-                    $"GPIO{port}->OSPEEDR |= ({(int)config.OutputSpeed}U << ({config.Pin}U * 2U));\n");
-            }
-        }
-    }
-
-    private void ConfigurePupdr(StringBuilder sb, List<GpioConfig> gpioConfig)
-    {
-        sb.AppendLine("/**\n" +
-                      " * PUPDR configuration\n" +
-                      " */\n"
-                      );
-        foreach (var config in gpioConfig)
-        {
-            var port = config.Port.ToString().ToUpper();
-            sb.AppendLine($"// Set GPIO{port} pull type | Pin = {config.Pin}");
-            sb.AppendLine($"GPIO{port}->PUPDR &= ~(3U << ({config.Pin}U * 2U));");
-            sb.AppendLine($"GPIO{port}->PUPDR |= ({(int)config.PullType}U << ({config.Pin}U * 2U));\n");
-            
-        }
-    }
-
-    private void ConfigureAlternateFunction(StringBuilder sb, List<GpioConfig> gpioConfig)
-    {
-        sb.AppendLine("/**\n" +
-                      " * Alternate function configuration\n" +
-                      " */\n"
-        );
-        sb.AppendLine("// Alternate function coming soon!");
     }
 
     private CodeGenerationResult ValidateConfig(List<GpioConfig> gpioConfig)
