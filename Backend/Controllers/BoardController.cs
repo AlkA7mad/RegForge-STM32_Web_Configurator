@@ -1,4 +1,3 @@
-using MCUGen.Api.DTOs;
 using MCUGen.Api.Models.Board;
 using MCUGen.Api.Services.Board;
 using Microsoft.AspNetCore.Mvc;

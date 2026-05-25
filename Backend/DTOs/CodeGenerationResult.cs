@@ -1,5 +1,3 @@
-using System.ComponentModel.DataAnnotations;
-
 namespace MCUGen.Api.DTOs;
 
 public class CodeGenerationResult

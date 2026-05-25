@@ -1,7 +1,6 @@
 using System.Text.Json.Serialization;
 using MCUGen.Api.Services.Board;
-using Microsoft.Extensions.Options;
-using MCUGen.Api.Services.GpioCodeGenerator;
+using MCUGen.Api.Services.CodeGenerator;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,7 +21,7 @@ builder.Services.AddSwaggerGen();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
-builder.Services.AddScoped<IGpioCodeGeneratorService, GpioCodeGeneratorService>();
+builder.Services.AddScoped<ICodeGeneratorService, CodeGeneratorService>();
 builder.Services.AddSingleton<IBoardService, BoardService>();
 
 var app = builder.Build();

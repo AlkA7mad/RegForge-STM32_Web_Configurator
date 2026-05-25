@@ -1,6 +1,6 @@
 using MCUGen.Api.Models.Enum;
 
-namespace MCUGen.Api.Models;
+namespace MCUGen.Api.Models.Peripherals;
 
 
 public class GpioConfig

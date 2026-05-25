@@ -1,4 +1,4 @@
-namespace MCUGen.Api.Models;
+namespace MCUGen.Api.Models.Enum;
 
 public enum PinMode
 {

@@ -1,5 +1,4 @@
 using System.Text.Json;
-using MCUGen.Api.Models.Board;
 using BoardModel = MCUGen.Api.Models.Board.Board;
 using BoardDataModel = MCUGen.Api.Models.Board.BoardData;
 
