@@ -4,11 +4,12 @@ import PinConfig from "../../components/PinConfig/PinConfig";
 import LoadingSpinner from "../../components/LoadingSpinner/LoadingSpinner";
 
 import type { BoardData } from "../../constants/boardData.type";
+import type { BoardConfigs } from "../../constants/configs.type";
 import type { GpioDropdownOptions } from "../../constants/boardData.type";
 import type { PinData } from "../../constants/PinConfig.type";
 import { defaultPin } from "../../constants/PinConfig.type";
 
-import { generateGpioCode } from "../../api/gpioAPI";
+import { generateCode } from "../../api/generateCodeAPI";
 import { getBoardData } from "../../api/boardAPI";
 
 import { transformOptions } from "../../utils/transformOptions";
@@ -41,7 +42,18 @@ function Configurator() {
 
       setIsLoading(true);
 
-      const result = await generateGpioCode(pins);
+      const configs: BoardConfigs = {
+        boardId: "NUCLEO-G431RB",
+        preferences: {
+          language: "",
+          abstraction: ""
+        },
+        peripheralConfig: {
+          gpioConfigs: pins
+        }
+      };
+
+      const result = await generateCode(configs);
       if (result.success) {
         setGeneratedCode(result.generatedCode);
         setErrors([]);
