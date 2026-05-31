@@ -1,4 +1,4 @@
-import type { GpioOptions, GpioDropdownOptions } from "../constants/boardData.type";
+import type { GpioOptions, GpioDropdownOptions } from "../types/boardData.type";
 
 export function transformOptions(gpio: GpioOptions): GpioDropdownOptions {
   const modes = gpio.modes.map((m) => ({

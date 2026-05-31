@@ -1,4 +1,4 @@
-import type { Board, BoardData } from "../constants/boardData.type";
+import type { Board, BoardData } from "../types/boardData.type";
 
 export async function getBoards(): Promise<Board[]> {
     

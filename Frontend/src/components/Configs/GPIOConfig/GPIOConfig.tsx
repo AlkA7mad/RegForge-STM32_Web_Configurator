@@ -1,16 +1,16 @@
-import Dropdown from "../Dropdown/Dropdown";
+import Dropdown from "../../Dropdown/Dropdown";
 
-import type { PinConfigProps } from "../../constants/PinConfig.type";
+import type { GPIOConfigProps } from "../../../types/GPIOConfig.type";
 
-import styles from "./PinConfig.module.scss";
+import styles from "./GPIOConfig.module.scss";
 
-function PinConfig({
+function GPIOConfig({
   pin,
   options,
   ports,
   onChange,
   onRemove,
-}: PinConfigProps) {
+}: GPIOConfigProps) {
   const portKey = `GPIO${pin.port}`;
   const pinOptions =
     ports[portKey]?.pins.map((p) => ({
@@ -89,4 +89,4 @@ function PinConfig({
   );
 }
 
-export default PinConfig;
+export default GPIOConfig;

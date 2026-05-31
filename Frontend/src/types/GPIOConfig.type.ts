@@ -1,6 +1,6 @@
 import type { PortInfo, GpioDropdownOptions } from "./boardData.type";
 
-export interface PinConfigProps {
+export interface GPIOConfigProps {
     pin: PinData;
     options: GpioDropdownOptions
     ports: { [key: string]: PortInfo}

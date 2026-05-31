@@ -1,4 +1,4 @@
-import type { PinData } from "../constants/PinConfig.type";
+import type { PinData } from "./GPIOConfig.type";
 
 export interface BoardConfigs {
   boardId: string;

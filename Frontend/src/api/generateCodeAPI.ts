@@ -1,4 +1,4 @@
-import type { BoardConfigs } from "../constants/configs.type";
+import type { BoardConfigs } from "../types/configs.type";
 
 
 interface CodeGenerationResult {
